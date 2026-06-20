@@ -1,6 +1,8 @@
 // Script for AutoType Clipboard extension popup
 
 document.addEventListener('DOMContentLoaded', async () => {
+  // Lightweight compatibility wrapper: prefer `browser`, fall back to `chrome`.
+  const ext = (typeof browser !== 'undefined') ? browser : (typeof chrome !== 'undefined' ? chrome : undefined);
   // Elements
   const btnAutoType = document.getElementById('btn-autotype');
   const modeChar = document.getElementById('mode-char');
@@ -34,7 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Load saved settings
-  const settings = await browser.storage.local.get({
+  const settings = await ext.storage.local.get({
     typingDelay: 100,
     typingMode: 'character',
     showFloatingButton: true,
@@ -184,7 +186,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Save all settings to browser storage
   function saveSettings() {
-    browser.storage.local.set({
+    ext.storage.local.set({
       typingDelay: parseInt(sliderDelay.value),
       typingMode: currentMode,
       showFloatingButton: toggleFab.checked,
@@ -197,9 +199,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Helper to send messages to the active tab's content script
   async function notifyActiveTab(message) {
     try {
-      const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+      const tabs = await ext.tabs.query({ active: true, currentWindow: true });
       if (tabs[0] && tabs[0].id !== undefined) {
-        return await browser.tabs.sendMessage(tabs[0].id, message);
+        return await ext.tabs.sendMessage(tabs[0].id, message);
       }
     } catch (e) {
       console.warn("Failed to notify active tab:", e);

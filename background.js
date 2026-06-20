@@ -1,5 +1,8 @@
 // Background service worker for AutoType Clipboard extension
 
+// Lightweight compatibility wrapper: prefer `browser`, fall back to `chrome`.
+const ext = (typeof browser !== 'undefined') ? browser : (typeof chrome !== 'undefined' ? chrome : undefined);
+
 // Helper to get clipboard text in a secure extension context
 async function getClipboardText() {
   try {
@@ -11,7 +14,7 @@ async function getClipboardText() {
 }
 
 // Listen for keyboard commands defined in manifest.json
-browser.commands.onCommand.addListener(async (command) => {
+ext.commands.onCommand.addListener(async (command) => {
   if (command === "trigger-autotype") {
     const text = await getClipboardText();
     if (!text) {
@@ -20,7 +23,7 @@ browser.commands.onCommand.addListener(async (command) => {
     }
 
     // Retrieve user settings from storage
-    const settings = await browser.storage.local.get({
+    const settings = await ext.storage.local.get({
       typingDelay: 100,
       typingMode: "character",
       randomizeDelay: true,
@@ -28,9 +31,9 @@ browser.commands.onCommand.addListener(async (command) => {
     });
 
     // Send to active tab's content script
-    const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+    const tabs = await ext.tabs.query({ active: true, currentWindow: true });
     if (tabs[0] && tabs[0].id !== undefined) {
-      browser.tabs.sendMessage(tabs[0].id, {
+      ext.tabs.sendMessage(tabs[0].id, {
         action: "typeText",
         text: text,
         delay: settings.typingDelay,
@@ -45,7 +48,7 @@ browser.commands.onCommand.addListener(async (command) => {
 });
 
 // Listen for messages from content script or popup
-browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+ext.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "readClipboard") {
     getClipboardText().then(text => {
       sendResponse({ text: text });

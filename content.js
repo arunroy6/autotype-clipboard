@@ -1,6 +1,9 @@
 // Content script for AutoType Clipboard extension
 console.log("[AutoType] Content script active on:", window.location.href);
 
+// Lightweight compatibility wrapper: prefer `browser`, fall back to `chrome`.
+const ext = (typeof browser !== 'undefined') ? browser : (typeof chrome !== 'undefined' ? chrome : undefined);
+
 let lastActiveElement = null;
 let isTyping = false;
 let shouldStopTyping = false;
@@ -124,7 +127,7 @@ function applyViewportPosition() {
   const defaultTop = window.innerHeight - 64;
 
   try {
-    browser.storage.local.get({ viewportPosition: null }).then(settings => {
+    ext.storage.local.get({ viewportPosition: null }).then(settings => {
       const pos = settings.viewportPosition || getLocalFallbackPosition() || { left: defaultLeft, top: defaultTop };
       
       const maxLeft = window.innerWidth - fab.offsetWidth - 8;
@@ -232,7 +235,7 @@ function setupDraggability() {
       };
       
       try {
-        browser.storage.local.set({ viewportPosition: pos });
+        ext.storage.local.set({ viewportPosition: pos });
       } catch (err) {
         try {
           localStorage.setItem('autotype-viewport-pos', JSON.stringify(pos));
@@ -305,7 +308,7 @@ function setupDraggability() {
       };
       
       try {
-        browser.storage.local.set({ viewportPosition: pos });
+        ext.storage.local.set({ viewportPosition: pos });
       } catch (err) {
         try {
           localStorage.setItem('autotype-viewport-pos', JSON.stringify(pos));
@@ -430,11 +433,11 @@ function createFAB() {
     if (target && isTextInput(target)) {
       target.focus();
       try {
-        const response = await browser.runtime.sendMessage({ action: "readClipboard" });
+        const response = await ext.runtime.sendMessage({ action: "readClipboard" });
         const text = response.text;
         
         if (text) {
-          const settings = await browser.storage.local.get({
+          const settings = await ext.storage.local.get({
             typingDelay: 10,
             typingMode: "character"
           });
@@ -455,7 +458,7 @@ function createFAB() {
 
 function showFAB() {
   try {
-    browser.storage.local.get({
+    ext.storage.local.get({
       showFloatingButton: true,
       buttonPlacement: 'input'
     }).then(settings => {
@@ -688,7 +691,7 @@ function getRandomizedDelay(baseDelay, percentage) {
 }
 
 // Message listener to handle paste requests or settings changes from commands or popup
-browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+ext.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "typeText") {
     const target = document.activeElement && isTextInput(document.activeElement)
       ? document.activeElement
