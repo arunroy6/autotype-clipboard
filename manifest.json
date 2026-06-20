@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "AutoType Clipboard",
+  "version": "1.0.0",
+  "description": "Bypasses copy/paste restrictions by emulating user keyboard typing for clipboard content.",
+  "permissions": [
+    "clipboardRead",
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.svg"
+  },
+  "icons": {
+    "48": "icon.svg",
+    "96": "icon.svg",
+    "128": "icon.svg"
+  },
+  "commands": {
+    "trigger-autotype": {
+      "suggested_key": {
+        "default": "Alt+Shift+K",
+        "mac": "Command+Alt+K"
+      },
+      "description": "Auto-type clipboard content"
+    }
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{c124345a-4a19-4594-a335-c39b4f8f1822}"
+    }
+  }
+}
