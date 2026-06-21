@@ -1,0 +1,8 @@
+{
+  "version": { "license": "MIT" },
+  "categories": { "firefox": ["privacy-security"] },
+  "name": { "en-US": "AutoType Clipboard" },
+  "description": { "en-US": "Bypasses copy/paste restrictions by emulating user keyboard typing for clipboard content." },
+  "summary": { "en-US": "AutoType Clipboard is a browser extension that allows users to bypass copy/paste restrictions on websites by emulating user keyboard typing with randomized delay for clipboard content." },
+  "default_locale": "en-US"
+}
