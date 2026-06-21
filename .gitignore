@@ -18,3 +18,7 @@ Thumbs.db
 
 # Extension specific local logs
 *.log
+
+# Extension specific local files
+.amo-upload-uuid
+*.zip
